@@ -6,6 +6,7 @@ import { normalizeAttr } from './normalizeAttr';
 import { normalizeValue } from './normalizeValue';
 import { parseFontDeclaration } from './parseFontDeclaration';
 import { parseStyleAttribute } from './parseStyleAttribute';
+import { parseValuesAttribute } from './parseValuesAttribute';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
 import type { CSSRules } from './typedefs';
 
@@ -56,6 +57,7 @@ export function parseAttributes(
     // (see: http://www.w3.org/TR/SVG/styling.html#UsingPresentationAttributes)
     ...getGlobalStylesForElement(element, cssRules),
     ...parseStyleAttribute(element),
+    ...parseValuesAttribute(element),
   };
 
   if (ownAttributes[cPath]) {
@@ -90,3 +92,4 @@ export function parseAttributes(
     ? mergedAttrs
     : setStrokeFillOpacity(mergedAttrs);
 }
+

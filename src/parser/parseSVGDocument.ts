@@ -7,6 +7,8 @@ import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
 import { log, SignalAbortedError } from '../util/internals/console';
 import { getTagName } from './getTagName';
+import { AnimateElement, FabricObject } from '../../fabric';
+import { AnimatableObject } from '../shapes/Object/AnimatableObject';
 
 const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(getTagName(el));
@@ -25,7 +27,7 @@ export const createEmptyResponse = (): SVGParsingOutput => ({
  * @memberOf fabric
  * @param {HTMLElement} doc SVG document to parse
  * @param {TSvgParsedCallback} callback Invoked when the parsing is done, with null if parsing wasn't possible with the list of svg nodes.
- * @param {TSvgReviverCallback} [reviver] Extra callback for further parsing of SVG elements, called after each fabric object has been created.
+ * @param {TSvgReviverCallback} [revivattr: string, i: number, p0: { duration: number; onComplete: () => void; }, animatable: Record<string, T>, options?: Partial<AnimationOptions<T>>ic object has been created.
  * Takes as input the original svg element and the generated `FabricObject` as arguments. Used to inspect extra properties not parsed by fabric,
  * or extra custom manipulation
  * @param {Object} [options] Object containing options for parsing
@@ -87,6 +89,44 @@ export async function parseSVGDocument(
   );
 
   const instances = await elementParser.parse();
+
+  // Assign all the parents of instances
+  for (var i = 0; i < elements.length; i++) {
+    if (elements[i].parentNode as Element != undefined) {
+      const parentIndex = elements.indexOf(elements[i].parentNode as Element);
+      if (instances as Array<FabricObject|null> != undefined && instances[i] as FabricObject != undefined) {
+          instances[i]!.parentFabricObject = instances[parentIndex];
+      }
+    }
+  }
+
+  // Animate all the parents of AnimateElements
+  for (var inst of instances) {
+    if (inst as AnimateElement != undefined && inst?.parentFabricObject as AnimatableObject != undefined) {
+      const animEl = inst as AnimateElement;
+      const parent = animEl.parentFabricObject as AnimatableObject;
+      const attr = animEl.attributeName;
+      if (animEl.values as number[] != undefined && animEl.values.length > 1) {
+        parent.set(attr, animEl.values[0]);
+        
+        function callback(i : number) {
+          if (i >= animEl.values.length) {
+            return;
+          }
+          parent.animate({attr: animEl.values[i]},
+            {
+              duration: (animEl.dur * 1000 / (animEl.values.length - 1)),
+              onChange: (v) => parent.set(attr, v),
+              onComplete: () => callback(i + 1),
+            }
+          );
+        }
+        callback(1);
+      }
+      console.log(`Animated element ${parent} attribute ${attr} over ${animEl.dur} seconds`);
+      console.log(`Using values ${animEl.values}`);
+    }
+  }
   
   return {
     objects: instances,

@@ -167,6 +167,8 @@ export class FabricObject<
   declare centeredRotation: boolean;
   declare centeredScaling: boolean;
 
+  declare parentFabricObject : FabricObject | null;
+
   /**
    * This list of properties is used to check if the state of an object is changed.
    * This state change now is only used for children of groups to understand if a group

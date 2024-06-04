@@ -1,7 +1,7 @@
 import { Gradient } from '../gradient/Gradient';
 import { Group } from '../shapes/Group';
 import { FabricImage } from '../shapes/Image';
-import { classRegistry } from '../ClassRegistry';
+import { ClassRegistry, classRegistry } from '../ClassRegistry';
 import {
   invertTransform,
   multiplyTransformMatrices,
@@ -20,7 +20,7 @@ import type { SVGOptions } from '../gradient';
 import { getTagName } from './getTagName';
 import { parseTransformAttribute } from './parseTransformAttribute';
 
-const findTag = (el: Element) =>
+const findTag = (el: Element) => 
   classRegistry.getSVGClass(getTagName(el).toLowerCase());
 
 type StorageType = {

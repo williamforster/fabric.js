@@ -87,7 +87,7 @@ export async function parseSVGDocument(
   );
 
   const instances = await elementParser.parse();
-
+  
   return {
     objects: instances,
     elements,

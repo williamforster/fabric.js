@@ -1,5 +1,6 @@
 import { Path } from '../shapes/Path';
 import { loadSVGFromString } from './loadSVGFromString';
+import { AnimateElement } from '../shapes/Object/AnimateElement';
 
 describe('loadSVGFromString', () => {
   it('returns successful parse of svg with use tag containing bad reference', async () => {
@@ -31,6 +32,21 @@ describe('loadSVGFromString', () => {
     const parsedSvg = await loadSVGFromString(str);
     if (parsedSvg.objects[0] !== null) {
       expect(parsedSvg.objects[0].isType('Path')).toBe(true);
+    }
+  });
+
+  it('returns successful parse of svg with animate element', async () => {
+    const str = `<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <rect width="10" height="10">
+        <animate attributeName="x" values="0;10" dur="1"/>
+      </rect>
+      </svg>`;
+    // need to load AnimateElement here for it to populate in class registry;
+    const unused = AnimateElement.name;
+    const parsedSvg = await loadSVGFromString(str)
+    expect(parsedSvg.objects[1]).not.toBeNull();
+    if (parsedSvg.objects[1] !== null) {
+      expect(parsedSvg.objects[1].isType('AnimateElement')).toBe(true);
     }
   });
 });

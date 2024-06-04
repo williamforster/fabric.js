@@ -26,6 +26,7 @@ export const svgValidTagNames = [
     'line',
     'image',
     'text',
+    'animate'
   ],
   svgViewBoxElements = ['symbol', 'image', 'marker', 'pattern', 'view', 'svg'],
   svgInvalidAncestors = [
@@ -37,7 +38,7 @@ export const svgValidTagNames = [
     'mask',
     'desc',
   ],
-  svgValidParents = ['symbol', 'g', 'a', 'svg', 'clipPath', 'defs'],
+  svgValidParents = ['symbol', 'g', 'a', 'svg', 'clipPath', 'defs', ...svgValidTagNames],
   attributesMap = {
     cx: LEFT,
     x: LEFT,
@@ -69,6 +70,11 @@ export const svgValidTagNames = [
     'clip-rule': 'clipRule',
     'vector-effect': 'strokeUniform',
     'image-rendering': 'imageSmoothing',
+    'values':'values',
+    'dur': 'dur',
+    'attributeName' : 'attributeName',
+    'from' : 'from',
+    'to' : 'to',
   },
   fSize = 'font-size',
   cPath = 'clip-path';

@@ -66,6 +66,8 @@ export type {
   FabricObjectProps,
   SerializedObjectProps,
 } from './src/shapes/Object/types';
+export type { AnimateProps } from './src/shapes/Object/AnimateElement';
+export { AnimateElement } from './src/shapes/Object/AnimateElement';
 export type { SerializedLineProps } from './src/shapes/Line';
 export { Line } from './src/shapes/Line';
 export type { CircleProps, SerializedCircleProps } from './src/shapes/Circle';

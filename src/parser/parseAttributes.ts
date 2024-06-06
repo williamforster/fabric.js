@@ -6,7 +6,7 @@ import { normalizeAttr } from './normalizeAttr';
 import { normalizeValue } from './normalizeValue';
 import { parseFontDeclaration } from './parseFontDeclaration';
 import { parseStyleAttribute } from './parseStyleAttribute';
-import { parseValuesAttribute } from './parseValuesAttribute';
+import { parseValuesAttribute, convertAttributeNames } from './parseSvgAnimationAttributes';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
 import type { CSSRules } from './typedefs';
 
@@ -58,6 +58,7 @@ export function parseAttributes(
     ...getGlobalStylesForElement(element, cssRules),
     ...parseStyleAttribute(element),
     ...parseValuesAttribute(element),
+    ...convertAttributeNames(element),
   };
 
   if (ownAttributes[cPath]) {

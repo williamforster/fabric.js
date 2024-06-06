@@ -8,7 +8,8 @@ export function normalizeValue(
   value: any,
   parentAttributes: Record<string, any>,
   fontSize: number
-): string | null | boolean | number[] | number {
+): string | string[] | null | boolean | number[] | number {
+  if (attr === 'values') {return value as string[];}
   const isArray = Array.isArray(value);
   let parsed: number | number[];
   let ouputValue: string | null | boolean | number[] | number = value;

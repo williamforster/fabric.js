@@ -22,26 +22,26 @@ interface UniqueAnimateProps {
     attributeName: string;
   
     /**
-     * List of space/semicolon separated numbers describing what values to animate
-     * attributeName by
-     * @type Number[]
-     * @default []
+     * List of space/semicolon separated numbers or strings describing what values to animate
+     * attributeName by. Could be for example 0;10 or hsl(0,1%,90%),hsl(0,0,0)
+     * @type string[]
+     * @default ''
      */
-    values: number[];
+    values: string[];
   
     /**
      * For a simple 2-value animation, where to start the animation. Overriden by 'values' tag
-     * @type Number
+     * @type Any
      * @default 0
      */
-    from: number;
+    from: any;
   
     /**
      * For a simple 2-value animation, where to end the animation. Overriden by 'values' tag
-     * @type Number
+     * @type Any
      * @default 0
      */
-    to: number;
+    to: any;
 
     /**
      * Duration of the animation in seconds
@@ -82,10 +82,10 @@ interface UniqueAnimateProps {
   implements UniqueAnimateProps
 {
   declare attributeName: string;
-  declare values: number[];
+  declare values: string[];
   declare from: number;
-  declare to: number;
-  declare dur: number;
+  declare to: any;
+  declare dur: any;
 
   static type = 'AnimateElement';
 
@@ -107,10 +107,6 @@ interface UniqueAnimateProps {
    */
   _set(key: string, value: any) {
     super._set(key, value);
-
-    // if (key === 'radius') {
-    //   this.setRadius(value);
-    // }
 
     return this;
   }

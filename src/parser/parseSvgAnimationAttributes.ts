@@ -7,8 +7,8 @@ import {attributesMap} from './constants';
  * @param {SVGElement} element Element to parse
  * @return {Object} Objects with values parsed from style attribute of an element
  */
-export function parseValuesAttribute(element: HTMLElement): Record<string, any> {
-  const ret: Record<string, number[]> = {},
+export function parseValuesAttribute(element: HTMLElement): Record<string, any[]> {
+  const ret: Record<string, any[]> = {},
     vals = element.getAttribute('values');
 
   if (!vals) {
@@ -16,14 +16,9 @@ export function parseValuesAttribute(element: HTMLElement): Record<string, any> 
   }
 
   if (typeof vals === 'string') {
-    const split = vals.replaceAll(';', ' ').split(' ');
-    for (var substring of split) {
-        if (isNaN(parseFloat(substring))) {
-            return ret;
-        }
-    }
+    const split = vals.split(';');
     // Success
-    return {values : split.map(parseFloat)};
+    return {values : split};
   }
 
   return ret;

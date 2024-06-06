@@ -6,7 +6,7 @@ import { normalizeAttr } from './normalizeAttr';
 import { normalizeValue } from './normalizeValue';
 import { parseFontDeclaration } from './parseFontDeclaration';
 import { parseStyleAttribute } from './parseStyleAttribute';
-import { parseValuesAttribute, convertAttributeNames } from './parseSvgAnimationAttributes';
+import { convertAttributeNames, parseValuesAttribute } from './parseSvgAnimationAttributes';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
 import type { CSSRules } from './typedefs';
 
@@ -73,7 +73,7 @@ export function parseAttributes(
   // this should have its own complex type
   const normalizedStyle: Record<
     string,
-    string | boolean | number | number[] | null
+    string | string[] | boolean | number | number[] | null
   > = {};
   for (const attr in ownAttributes) {
     const normalizedAttr = normalizeAttr(attr);

@@ -10,7 +10,6 @@ import { getTagName } from './getTagName';
 import { AnimateElement, FabricObject } from '../../fabric';
 import { AnimatableObject } from '../shapes/Object/AnimatableObject';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
-import { Key } from 'readline';
 
 const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(getTagName(el));
@@ -94,57 +93,70 @@ export async function parseSVGDocument(
 
   // Assign all the parents of instances
   for (var i = 0; i < elements.length; i++) {
-    if (elements[i].parentNode as Element != undefined) {
+    if ((elements[i].parentNode as Element) != undefined) {
       const parentIndex = elements.indexOf(elements[i].parentNode as Element);
-      if (instances as Array<FabricObject|null> != undefined && instances[i] as FabricObject != undefined) {
-          instances[i]!.parentFabricObject = instances[parentIndex];
+      if (
+        (instances as Array<FabricObject | null>) != undefined &&
+        (instances[i] as FabricObject) != undefined
+      ) {
+        instances[i]!.parentFabricObject = instances[parentIndex];
       }
     }
   }
 
   // Animate all the parents of AnimateElements
   for (var inst of instances) {
-    if (inst as AnimateElement != undefined && inst?.parentFabricObject as AnimatableObject != undefined) {
+    if (
+      (inst as AnimateElement) != undefined &&
+      (inst?.parentFabricObject as AnimatableObject) != undefined
+    ) {
       const animEl = inst as AnimateElement;
       const parent = animEl.parentFabricObject as AnimatableObject;
       const attr = animEl.attributeName;
-      if (!attr) {break;}
+      if (!attr) {
+        break;
+      }
       // Convert strings to the values that fabric expects
       const normalizedValues = animEl.values.map((val: any) => {
-        var ret : any = parseFloat(val);
-        if (!isNaN(ret)) { return ret as number;}
-        const asRecord : Record<string, any>  =  {[attr]: val};
+        var ret: any = parseFloat(val);
+        if (!isNaN(ret)) {
+          return ret as number;
+        }
+        const asRecord: Record<string, any> = { [attr]: val };
         ret = setStrokeFillOpacity(asRecord);
         return ret[attr];
       });
       if (normalizedValues.length > 1) {
         parent.set(attr, normalizedValues[0]);
-        
-        function callback(i : number) {
+
+        function callback(i: number) {
           if (i >= normalizedValues.length) {
             i = 0;
           }
-          const animRecord : Record<string,any> = {[attr]: normalizedValues[i]};
-          parent.animate(animRecord,
-            {
-              duration: (animEl.dur * 1000 / (normalizedValues.length - 1)),
-              onChange: (v: any) => {
-                parent.set(attr, v);
-                if (parent.canvas) {
-                  parent.canvas.requestRenderAll();
-                }
-              },
-              onComplete: () => callback(i + 1)
-            }
-          );
+          const animRecord: Record<string, any> = {
+            [attr]: normalizedValues[i],
+          };
+          parent.animate(animRecord, {
+            duration: (animEl.dur * 1000) / (normalizedValues.length - 1),
+            onChange: (v: any) => {
+              console.log(v);
+              parent.set(attr, v);
+              if (parent.canvas) {
+                parent.canvas.requestRenderAll();
+              }
+            },
+            onComplete: () => callback(i + 1),
+          });
         }
         callback(1);
       }
-      console.log(`Animated element ${parent} attribute ${attr} over ${animEl.dur} seconds`);
+      console.log(
+        `Animated element ${parent} attribute ${attr} over ${animEl.dur} seconds`
+      );
       console.log(`Using values ${animEl.values}`);
     }
   }
-  
+
   return {
     objects: instances,
     elements,

@@ -62,7 +62,8 @@ export abstract class AnimatableObject<
       target: this,
       // path.reduce... is the current value in case start value isn't provided
       startValue:
-        startValue ?? path.reduce((deep: any, key) => deep[key], this),
+        //startValue ?? path.reduce((deep: any, key) => deep[key], this),
+        this.get(key),
       endValue,
       abort: abort?.bind(this),
       onChange: (
@@ -72,7 +73,7 @@ export abstract class AnimatableObject<
       ) => {
         path.reduce((deep: Record<string, any>, key, index) => {
           if (index === path.length - 1) {
-            deep[key] = value;
+            //deep[key] = value;
           }
           return deep[key];
         }, this);

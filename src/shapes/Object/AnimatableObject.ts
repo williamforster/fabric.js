@@ -60,10 +60,8 @@ export abstract class AnimatableObject<
     const animationOptions = {
       ...options,
       target: this,
-      // path.reduce... is the current value in case start value isn't provided
       startValue:
-        //startValue ?? path.reduce((deep: any, key) => deep[key], this),
-        this.get(key),
+        startValue ?? path.reduce((deep: any, key) => deep[key], this),
       endValue,
       abort: abort?.bind(this),
       onChange: (
@@ -71,12 +69,20 @@ export abstract class AnimatableObject<
         valueProgress: number,
         durationProgress: number
       ) => {
-        path.reduce((deep: Record<string, any>, key, index) => {
-          if (index === path.length - 1) {
-            //deep[key] = value;
-          }
-          return deep[key];
-        }, this);
+        // Set the value for this frame, and call the user onChange
+        // key could be keypath like 'shadow.offsetX' or just a property
+        if (path.length > 1) {
+          path.reduce((accumulator: Record<string, any>, key, index) => {
+            if (index === path.length - 1) {
+              accumulator[key] = value;
+              return null;
+            }
+            return accumulator[key];
+          }, this);
+        } else {
+          // For some reason the above doesn't work for single key paths.
+          this.set(key, value);
+        }
         onChange &&
           // @ts-expect-error generic callback arg0 is wrong
           onChange(value, valueProgress, durationProgress);

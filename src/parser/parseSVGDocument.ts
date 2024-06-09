@@ -139,8 +139,6 @@ export async function parseSVGDocument(
           parent.animate(animRecord, {
             duration: (animEl.dur * 1000) / (normalizedValues.length - 1),
             onChange: (v: any) => {
-              console.log(v);
-              parent.set(attr, v);
               if (parent.canvas) {
                 parent.canvas.requestRenderAll();
               }
@@ -150,10 +148,6 @@ export async function parseSVGDocument(
         }
         callback(1);
       }
-      console.log(
-        `Animated element ${parent} attribute ${attr} over ${animEl.dur} seconds`
-      );
-      console.log(`Using values ${animEl.values}`);
     }
   }
 

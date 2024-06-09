@@ -129,12 +129,22 @@ export async function parseSVGDocument(
       if (normalizedValues.length > 1) {
         parent.set(attr, normalizedValues[0]);
 
-        function callback(i: number) {
-          if (i >= normalizedValues.length) {
-            i = 0;
+        function callback(valuesIndex: number, repeatCount: string | number) {
+          var nextRepeatCount = repeatCount;
+          if (valuesIndex >= normalizedValues.length) {
+            nextRepeatCount =
+              repeatCount === 'indefinite'
+                ? repeatCount
+                : (repeatCount as number) - 1;
+            if (nextRepeatCount === 0) {
+              return;
+            }
+            parent.set(attr, normalizedValues[0]);
+            valuesIndex = 1;
           }
+
           const animRecord: Record<string, any> = {
-            [attr]: normalizedValues[i],
+            [attr]: normalizedValues[valuesIndex],
           };
           parent.animate(animRecord, {
             duration: (animEl.dur * 1000) / (normalizedValues.length - 1),
@@ -143,10 +153,10 @@ export async function parseSVGDocument(
                 parent.canvas.requestRenderAll();
               }
             },
-            onComplete: () => callback(i + 1),
+            onComplete: () => callback(valuesIndex + 1, nextRepeatCount),
           });
         }
-        callback(1);
+        callback(1, animEl.repeatCount);
       }
     }
   }

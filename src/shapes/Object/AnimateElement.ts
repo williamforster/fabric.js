@@ -10,70 +10,77 @@ import { parseAttributes } from '../../parser/parseAttributes';
 import type { Abortable, TClassProperties, TOptions } from '../../typedefs';
 import type { FabricObjectProps, SerializedObjectProps } from './types';
 import type { CSSRules } from '../../parser/typedefs';
-import { AnimatableObject } from './AnimatableObject';
-
 
 interface UniqueAnimateProps {
-    /**
-     * Attribute to animate eg. 'cx' for circle x-position
-     * @type String
-     * @default '''
-     */
-    attributeName: string;
-  
-    /**
-     * List of space/semicolon separated numbers or strings describing what values to animate
-     * attributeName by. Could be for example 0;10 or hsl(0,1%,90%),hsl(0,0,0)
-     * @type string[]
-     * @default ''
-     */
-    values: string[];
-  
-    /**
-     * For a simple 2-value animation, where to start the animation. Overriden by 'values' tag
-     * @type Any
-     * @default 0
-     */
-    from: any;
-  
-    /**
-     * For a simple 2-value animation, where to end the animation. Overriden by 'values' tag
-     * @type Any
-     * @default 0
-     */
-    to: any;
+  /**
+   * Attribute to animate eg. 'cx' for circle x-position
+   * @type String
+   * @default '''
+   */
+  attributeName: string;
 
-    /**
-     * Duration of the animation in seconds
-     * @type Number
-     * @default 1
-     */
-    dur: number;
-  }
+  /**
+   * List of space/semicolon separated numbers or strings describing what values to animate
+   * attributeName by. Could be for example 0;10 or hsl(0,1%,90%),hsl(0,0,0)
+   * @type string[]
+   * @default ''
+   */
+  values: string[];
 
-  export interface SerializedAnimateProps
+  /**
+   * For a simple 2-value animation, where to start the animation. Overriden by 'values' tag
+   * @type Any
+   * @default 0
+   */
+  from: any;
+
+  /**
+   * For a simple 2-value animation, where to end the animation. Overriden by 'values' tag
+   * @type Any
+   * @default 0
+   */
+  to: any;
+
+  /**
+   * Duration of the animation in seconds
+   * @type Number
+   * @default 1
+   */
+  dur: number;
+
+  /**
+   * Number of times to repeat animation or 'indefinite'
+   * @type Number | String
+   * @default 1
+   */
+  repeatCount: number | string;
+}
+
+export interface SerializedAnimateProps
   extends SerializedObjectProps,
     UniqueAnimateProps {}
 
-  export interface AnimateProps extends FabricObjectProps, UniqueAnimateProps {}
+export interface AnimateProps extends FabricObjectProps, UniqueAnimateProps {}
 
-  const ANIMATE_PROPS = [
-    'attributeName',
-    'values',
-    'from',
-    'to',
-    'dur',
-  ] as const;
+const ANIMATE_PROPS = [
+  'attributeName',
+  'values',
+  'from',
+  'to',
+  'dur',
+  'repeatCount',
+] as const;
 
-  export const animateDefaultValues: Partial<TClassProperties<AnimateElement>> = {
-    attributeName: '',
-    values: [],
-    from: 0,
-    to: 0,
-    dur: 0,
-  };
+export const animateDefaultValues: Partial<TClassProperties<AnimateElement>> = {
+  attributeName: '',
+  values: [],
+  from: 0,
+  to: 0,
+  dur: 0,
+  repeatCount: 1,
+};
 
-  export class AnimateElement<
+export class AnimateElement<
     Props extends TOptions<AnimateProps> = Partial<AnimateProps>,
     SProps extends SerializedAnimateProps = SerializedAnimateProps,
     EventSpec extends ObjectEvents = ObjectEvents
@@ -86,6 +93,7 @@ interface UniqueAnimateProps {
   declare from: number;
   declare to: any;
   declare dur: any;
+  declare repeatCount: number | string;
 
   static type = 'AnimateElement';
 
@@ -128,7 +136,6 @@ interface UniqueAnimateProps {
     this._renderPaintInOrder(ctx);*/
   }
 
-
   /**
    * Returns object representation of an instance
    * @param {Array} [propertiesToInclude] Any properties that you might want to additionally include in the output
@@ -147,7 +154,7 @@ interface UniqueAnimateProps {
    * Returns svg representation of an instance
    * @return {Array} an array of strings with the specific svg representation
    * of the instance
-   *//*
+   */ /*
   _toSVG(): string[] {
     const angle = (this.endAngle - this.startAngle) % 360;
 
@@ -202,11 +209,12 @@ interface UniqueAnimateProps {
     cssRules?: CSSRules
   ): Promise<AnimateElement> {
     const {
-        attributeName='',
-        values=[],
-        dur=0,
-        from=0,
-        to=0,
+      attributeName = '',
+      values = [],
+      dur = 0,
+      from = 0,
+      to = 0,
+      repeatCount = 1,
       ...otherParsedAttributes
     } = parseAttributes(
       element,
@@ -215,12 +223,13 @@ interface UniqueAnimateProps {
     ) as Partial<AnimateProps>;
 
     const ret = new this({
-        ...otherParsedAttributes,
-        attributeName,
-        values,
-        dur,
-        from,
-        to,
+      ...otherParsedAttributes,
+      attributeName,
+      values,
+      dur,
+      from,
+      to,
+      repeatCount,
     });
 
     return ret;

@@ -10,6 +10,7 @@ import { getTagName } from './getTagName';
 import { AnimateElement, FabricObject } from '../../fabric';
 import { AnimatableObject } from '../shapes/Object/AnimatableObject';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
+import { easeNone } from '../util/animation/easing';
 
 const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(getTagName(el));
@@ -154,6 +155,7 @@ export async function parseSVGDocument(
               }
             },
             onComplete: () => callback(valuesIndex + 1, nextRepeatCount),
+            easing: easeNone,
           });
         }
         callback(1, animEl.repeatCount);

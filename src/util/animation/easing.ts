@@ -325,3 +325,12 @@ export const easeInOutQuad: TEasingFunction = (t, b, c, d) => {
   }
   return (-c / 2) * (--t * (t - 2) - 1) + b;
 };
+
+export const easeNone: TEasingFunction = (
+  timeElapsed,
+  startValue,
+  byValue,
+  duration
+) => {
+  return startValue + byValue * (timeElapsed / duration);
+};

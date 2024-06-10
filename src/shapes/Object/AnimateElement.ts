@@ -42,6 +42,13 @@ interface UniqueAnimateProps {
   to: any;
 
   /**
+   * For a simple 2-value animation, how much to change by. Overriden by 'values' tag
+   * @type Number
+   * @default 0
+   */
+  by: number;
+
+  /**
    * Duration of the animation in seconds
    * @type Number
    * @default 1
@@ -69,6 +76,7 @@ const ANIMATE_PROPS = [
   'to',
   'dur',
   'repeatCount',
+  'by',
 ] as const;
 
 export const animateDefaultValues: Partial<TClassProperties<AnimateElement>> = {
@@ -78,6 +86,7 @@ export const animateDefaultValues: Partial<TClassProperties<AnimateElement>> = {
   to: 0,
   dur: 0,
   repeatCount: 1,
+  by: 0,
 };
 
 export class AnimateElement<
@@ -94,6 +103,7 @@ export class AnimateElement<
   declare to: any;
   declare dur: any;
   declare repeatCount: number | string;
+  declare by: number;
 
   static type = 'AnimateElement';
 
@@ -215,6 +225,7 @@ export class AnimateElement<
       from = 0,
       to = 0,
       repeatCount = 1,
+      by = 0,
       ...otherParsedAttributes
     } = parseAttributes(
       element,
@@ -230,6 +241,7 @@ export class AnimateElement<
       from,
       to,
       repeatCount,
+      by,
     });
 
     return ret;

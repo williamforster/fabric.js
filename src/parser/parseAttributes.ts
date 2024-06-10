@@ -6,7 +6,11 @@ import { normalizeAttr } from './normalizeAttr';
 import { normalizeValue } from './normalizeValue';
 import { parseFontDeclaration } from './parseFontDeclaration';
 import { parseStyleAttribute } from './parseStyleAttribute';
-import { convertAttributeNames, parseValuesAttribute } from './parseSvgAnimationAttributes';
+import {
+  convertAttributeNames,
+  parseFromToByAttribute,
+  parseValuesAttribute,
+} from './parseSvgAnimationAttributes';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
 import type { CSSRules } from './typedefs';
 
@@ -59,6 +63,7 @@ export function parseAttributes(
     ...parseStyleAttribute(element),
     ...parseValuesAttribute(element),
     ...convertAttributeNames(element),
+    ...parseFromToByAttribute(element),
   };
 
   if (ownAttributes[cPath]) {
@@ -93,4 +98,3 @@ export function parseAttributes(
     ? mergedAttrs
     : setStrokeFillOpacity(mergedAttrs);
 }
-

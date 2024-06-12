@@ -326,6 +326,9 @@ export const easeInOutQuad: TEasingFunction = (t, b, c, d) => {
   return (-c / 2) * (--t * (t - 2) - 1) + b;
 };
 
+/**
+ * Linear interpolation aka no easing
+ */
 export const easeNone: TEasingFunction = (
   timeElapsed,
   startValue,

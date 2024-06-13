@@ -1,11 +1,12 @@
 import type { TColorArg } from '../../color/typedefs';
+import { TMat2D } from '../../typedefs';
 import type { AnimationBase } from './AnimationBase';
 
 export type AnimationState = 'pending' | 'running' | 'completed' | 'aborted';
 
 /**
  * Callback called every frame
- * @param {number | number[]} value current value of the animation.
+ * @param {number | number[] | TMat2D} value current value of the animation.
  * @param {number} valueProgress ∈ [0, 1], the current animation progress reflected on value, normalized.
  * 0 is the starting value and 1 is the ending value.
  * @param {number} durationProgress ∈ [0, 1], the current animation duration normalized to 1.
@@ -32,19 +33,13 @@ export type TAbortCallback<T> = TOnAnimationChangeCallback<T, boolean>;
  * @param duration in ms
  * @returns next value
  */
-export type TEasingFunction<T = unknown> = T extends number[]
-  ? (
+export type TEasingFunction<T = unknown> = 
+  (
       timeElapsed: number,
       startValue: number,
       byValue: number,
       duration: number,
-      index: number
-    ) => number
-  : (
-      timeElapsed: number,
-      startValue: number,
-      byValue: number,
-      duration: number
+      index?: number
     ) => number;
 
 export type TAnimationBaseOptions<T> = {
@@ -99,7 +94,7 @@ export type TBaseAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
   TAnimationBaseOptions<TEasing> & TAnimationCallbacks<TCallback>
 > & {
   startValue: T;
-  byValue: T;
+  byValue: T | any; // Could be a TQrMatrixDecompOut or anything else
 };
 
 export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
@@ -122,6 +117,8 @@ export type TAnimationOptions<T, TCallback = T, TEasing = T> = Partial<
 export type ValueAnimationOptions = TAnimationOptions<number>;
 
 export type ArrayAnimationOptions = TAnimationOptions<number[]>;
+
+export type TransformAnimationOptions = TAnimationOptions<TMat2D, TMat2D, number>;
 
 export type ColorAnimationOptions = TAnimationOptions<
   TColorArg,

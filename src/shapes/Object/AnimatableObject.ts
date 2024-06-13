@@ -1,12 +1,14 @@
+import { TMat2D } from '../../typedefs';
 import type { TColorArg } from '../../color/typedefs';
 import type { ObjectEvents } from '../../EventTypeDefs';
 import type { TAnimation } from '../../util/animation/animate';
-import { animate, animateColor } from '../../util/animation/animate';
+import { animate, animateColor, animateTransform } from '../../util/animation/animate';
 import type {
   AnimationOptions,
   ArrayAnimationOptions,
   ColorAnimationOptions,
   ValueAnimationOptions,
+  TransformAnimationOptions,
 } from '../../util/animation/types';
 import { StackedObject } from './StackedObject';
 
@@ -31,7 +33,7 @@ export abstract class AnimatableObject<
    * object.animate({ left: ..., top: ... });
    * object.animate({ left: ..., top: ... }, { duration: ... });
    */
-  animate<T extends number | number[] | TColorArg>(
+  animate<T extends number | number[] | TColorArg | TMat2D>(
     animatable: Record<string, T>,
     options?: Partial<AnimationOptions<T>>
   ): Record<string, TAnimation<T>> {
@@ -47,7 +49,7 @@ export abstract class AnimatableObject<
    * @param {String} to Value to animate to
    * @param {Object} [options] Options object
    */
-  _animate<T extends number | number[] | TColorArg>(
+  _animate<T extends number | number[] | TColorArg | TMat2D>(
     key: string,
     endValue: T,
     options: Partial<AnimationOptions<T>> = {}
@@ -56,6 +58,7 @@ export abstract class AnimatableObject<
     const propIsColor = (
       this.constructor as typeof AnimatableObject
     ).colorProperties.includes(path[path.length - 1]);
+    const propIsTransform = key.toLowerCase() === 'transformmatrix';
     const { abort, startValue, onChange, onComplete } = options;
     const animationOptions = {
       ...options,
@@ -65,7 +68,7 @@ export abstract class AnimatableObject<
       endValue,
       abort: abort?.bind(this),
       onChange: (
-        value: number | number[] | string,
+        value: number | number[] | string | TMat2D,
         valueProgress: number,
         durationProgress: number
       ) => {
@@ -88,7 +91,7 @@ export abstract class AnimatableObject<
           onChange(value, valueProgress, durationProgress);
       },
       onComplete: (
-        value: number | number[] | string,
+        value: number | number[] | string | TMat2D,
         valueProgress: number,
         durationProgress: number
       ) => {
@@ -102,8 +105,10 @@ export abstract class AnimatableObject<
     return (
       propIsColor
         ? animateColor(animationOptions as ColorAnimationOptions)
+        : propIsTransform 
+        ? animateTransform(animationOptions as TransformAnimationOptions)
         : animate(
-            animationOptions as ValueAnimationOptions | ArrayAnimationOptions
+            animationOptions as ValueAnimationOptions | ArrayAnimationOptions | TransformAnimationOptions
           )
     ) as TAnimation<T>;
   }

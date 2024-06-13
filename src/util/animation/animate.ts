@@ -1,25 +1,32 @@
 import { ValueAnimation } from './ValueAnimation';
 import { ArrayAnimation } from './ArrayAnimation';
 import { ColorAnimation } from './ColorAnimation';
+import { TransformAnimation } from './TransformAnimation';
 import type {
   ValueAnimationOptions,
   ArrayAnimationOptions,
   ColorAnimationOptions,
+  TransformAnimationOptions,
 } from './types';
 import type { TColorArg } from '../../color/typedefs';
+import { TMat2D } from 'fabric/node';
+import { Transform } from 'stream';
 
-export type TAnimation<T extends number | number[] | TColorArg> =
+export type TAnimation<T extends number | number[] | TColorArg | TMat2D> =
   T extends TColorArg
     ? ColorAnimation
+    : T extends TMat2D
+    ? TransformAnimation
     : T extends number[]
     ? ArrayAnimation
     : ValueAnimation;
 
 const isArrayAnimation = (
-  options: ArrayAnimationOptions | ValueAnimationOptions
+  options: ArrayAnimationOptions | ValueAnimationOptions | TransformAnimationOptions
 ): options is ArrayAnimationOptions => {
-  return Array.isArray(options.startValue) || Array.isArray(options.endValue);
+  return Array.isArray(options.startValue) && Array.isArray(options.endValue);
 };
+
 
 /**
  * Changes value(s) from startValue to endValue within a certain period of time,
@@ -49,19 +56,29 @@ const isArrayAnimation = (
  */
 export function animate(options: ArrayAnimationOptions): ArrayAnimation;
 export function animate(options: ValueAnimationOptions): ValueAnimation;
+export function animate(options: TransformAnimationOptions): TransformAnimation;
 export function animate<
-  T extends ValueAnimationOptions | ArrayAnimationOptions
+  T extends ValueAnimationOptions | ArrayAnimationOptions | TransformAnimationOptions
 >(
   options: T
-): T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation;
+): T extends ArrayAnimationOptions 
+? ArrayAnimation 
+: T extends TransformAnimationOptions 
+? TransformAnimation
+: ValueAnimation;
+
 export function animate<
-  T extends ValueAnimationOptions | ArrayAnimationOptions,
-  R extends T extends ArrayAnimationOptions ? ArrayAnimation : ValueAnimation
+  T extends ValueAnimationOptions | ArrayAnimationOptions | TransformAnimationOptions,
+  R extends T extends ArrayAnimationOptions 
+  ? ArrayAnimation 
+  : T extends TransformAnimationOptions
+  ? TransformAnimation
+  : ValueAnimation
 >(options: T): R {
   const animation = (
     isArrayAnimation(options)
       ? new ArrayAnimation(options)
-      : new ValueAnimation(options)
+      : new ValueAnimation(options as ValueAnimationOptions)
   ) as R;
   animation.start();
   return animation;
@@ -69,6 +86,12 @@ export function animate<
 
 export function animateColor(options: ColorAnimationOptions) {
   const animation = new ColorAnimation(options);
+  animation.start();
+  return animation;
+}
+
+export function animateTransform(options: TransformAnimationOptions) {
+  const animation = new TransformAnimation(options);
   animation.start();
   return animation;
 }

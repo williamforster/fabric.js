@@ -32,6 +32,18 @@ export type TQrDecomposeOut = Required<
   Omit<TComposeMatrixArgs, 'flipX' | 'flipY'>
 >;
 
+export const decomposedIdentity = () => {
+  return {
+    scaleX: 1,
+    scaleY: 1,
+    angle: 0,
+    skewX: 0,
+    skewY: 0,
+    translateX: 0,
+    translateY: 0,
+  } as TQrDecomposeOut
+}
+
 export const isIdentityMatrix = (mat: TMat2D) =>
   mat.every((value, index) => value === iMatrix[index]);
 

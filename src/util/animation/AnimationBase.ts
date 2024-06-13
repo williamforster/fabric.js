@@ -1,3 +1,4 @@
+import { TMat2D } from '../../typedefs';
 import { noop } from '../../constants';
 import { requestAnimFrame } from './AnimationFrameProvider';
 import { runningAnimations } from './AnimationRegistry';
@@ -13,14 +14,14 @@ import type {
 const defaultAbort = () => false;
 
 export abstract class AnimationBase<
-  T extends number | number[] = number | number[]
+  T extends number | number[] | TMat2D = number | number[] | TMat2D
 > {
   declare readonly startValue: T;
   declare readonly endValue: T;
   declare readonly duration: number;
   declare readonly delay: number;
 
-  protected declare readonly byValue: T;
+  protected declare readonly byValue: T | any;
   protected declare readonly easing: TEasingFunction<T>;
 
   private declare readonly _onStart: VoidFunction;

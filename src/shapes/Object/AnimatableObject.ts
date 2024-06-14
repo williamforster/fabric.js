@@ -11,6 +11,8 @@ import type {
   TransformAnimationOptions,
 } from '../../util/animation/types';
 import { StackedObject } from './StackedObject';
+import { FabricObject } from './FabricObject';
+import { applyTransformToObject } from '../../util/misc/objectTransforms';
 
 export abstract class AnimatableObject<
   EventSpec extends ObjectEvents = ObjectEvents
@@ -82,6 +84,10 @@ export abstract class AnimatableObject<
             }
             return accumulator[key];
           }, this);
+        } else if (key.toLowerCase() === 'transformmatrix') {
+          if (this as unknown as FabricObject !== undefined) {
+            applyTransformToObject(this as unknown as FabricObject, value as TMat2D);
+          }
         } else {
           // For some reason the above doesn't work for single key paths.
           this.set(key, value);

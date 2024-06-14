@@ -93,3 +93,34 @@ export function parseTransformAttribute(attributeValue: string): TMat2D {
 
   return multiplyTransformMatrixArray(matrices);
 }
+
+/**
+ * Parses "transform-origin" attribute, returning a record with originX and originY filled in
+ * @static
+ * @memberOf fabric
+ * @param {SVGElement} element Element to parse
+ * @return {Record<string,number>} Objects with values parsed from transform-origin attribute of an element
+ */
+export function parseTransformOriginAttribute(
+  element: HTMLElement
+): Record<string, number> {
+  const ret: Record<string, any> = {},
+    vals = element.getAttribute('transform-origin');
+
+  if (!vals) {
+    return ret;
+  }
+
+  if (typeof vals === 'string') {
+    const noWhitespace = vals.replaceAll(/[\s\,]+/g, ';');
+    const split = noWhitespace.split(';');
+    if (split.length < 2) { return ret; }
+    const x = parseFloat(split[0]);
+    const y = parseFloat(split[1]);
+    if (!isNaN(x) && !isNaN(y)) {
+      return {originX: x, originY: y};
+    }
+  }
+
+  return ret;
+}

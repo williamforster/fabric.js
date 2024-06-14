@@ -11,6 +11,7 @@ import {
   parseFromToByAttribute,
   parseValuesAttribute,
 } from './parseSvgAnimationAttributes';
+import { parseTransformOriginAttribute } from './parseTransformAttribute';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
 import type { CSSRules } from './typedefs';
 
@@ -62,6 +63,7 @@ export function parseAttributes(
     ...getGlobalStylesForElement(element, cssRules),
     ...parseStyleAttribute(element),
     ...parseValuesAttribute(element),
+    ...parseTransformOriginAttribute(element),
     ...convertAttributeNames(element),
     ...parseFromToByAttribute(element),
   };

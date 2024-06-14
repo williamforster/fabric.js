@@ -84,6 +84,7 @@ export const svgValidTagNames = [
     from: 'from',
     to: 'to',
     repeatCount: 'repeatCount',
+    'transform-origin': 'transform-origin',
   },
   fSize = 'font-size',
   cPath = 'clip-path';

@@ -7,10 +7,13 @@ import type { LoadImageOptions } from '../util/misc/objectEnlive';
 import { ElementsParser } from './elements_parser';
 import { log, SignalAbortedError } from '../util/internals/console';
 import { getTagName } from './getTagName';
-import { AnimateElement, FabricObject } from '../../fabric';
+import { AnimateElement} from '../shapes/Object/AnimateElement';
+import { FabricObject } from '../shapes/Object/FabricObject';
 import { AnimatableObject } from '../shapes/Object/AnimatableObject';
 import { setStrokeFillOpacity } from './setStrokeFillOpacity';
 import { easeNone } from '../util/animation/easing';
+import { parseTransformAttribute } from './parseTransformAttribute';
+import { applyTransformToObject } from '../util/misc/objectTransforms';
 
 const isValidSvgTag = (el: Element) =>
   svgValidTagNamesRegEx.test(getTagName(el));
@@ -123,12 +126,18 @@ export async function parseSVGDocument(
         if (!isNaN(ret)) {
           return ret as number;
         }
+        if (attr.toLowerCase() === 'transformmatrix') {
+          ret = parseTransformAttribute(val);
+          ret[4] += parent.originX;
+          ret[5] += parent.originY;
+          return ret;
+        }
         const asRecord: Record<string, any> = { [attr]: val };
         ret = setStrokeFillOpacity(asRecord);
         return ret[attr];
       });
+
       if (normalizedValues.length > 1) {
-        parent.set(attr, normalizedValues[0]);
 
         function callback(valuesIndex: number, repeatCount: string | number) {
           var nextRepeatCount = repeatCount;
@@ -140,22 +149,29 @@ export async function parseSVGDocument(
             if (nextRepeatCount === 0) {
               return;
             }
-            parent.set(attr, normalizedValues[0]);
+            // Handle transform case
+            if (attr.toLowerCase() === 'transformmatrix') {
+              applyTransformToObject(parent as unknown as FabricObject, normalizedValues[0]);
+            } else { // value is just a single attr eg 'width'
+              parent.set(attr, normalizedValues[0]);
+            }
             valuesIndex = 1;
           }
 
-          const animRecord: Record<string, any> = {
+          var animRecord: Record<string, any> = {
             [attr]: normalizedValues[valuesIndex],
           };
           parent.animate(animRecord, {
             duration: (animEl.dur * 1000) / (normalizedValues.length - 1),
             onChange: (v: any) => {
+              //console.log(v);
               if (parent.canvas) {
                 parent.canvas.requestRenderAll();
               }
             },
             onComplete: () => callback(valuesIndex + 1, nextRepeatCount),
             easing: easeNone,
+            startValue: normalizedValues[valuesIndex - 1],
           });
         }
         callback(1, animEl.repeatCount);

@@ -66,7 +66,12 @@ export abstract class AnimatableObject<
       ...options,
       target: this,
       startValue:
-        startValue ?? path.reduce((deep: any, key) => deep[key], this),
+        startValue ?? (function(animateObj) {
+          if (propIsTransform) {
+            return animateObj.calcOwnMatrix();
+          }
+          return path.reduce((deep: any, key) => deep[key], animateObj)
+        })(this),
       endValue,
       abort: abort?.bind(this),
       onChange: (

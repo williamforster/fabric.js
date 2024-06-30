@@ -216,24 +216,6 @@ export class FabricObject<
   declare _cacheCanvas?: HTMLCanvasElement;
 
   /**
-   * Size of the cache canvas, width
-   * since 1.7.0
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare cacheWidth?: number;
-
-  /**
-   * Size of the cache canvas, height
-   * since 1.7.0
-   * @type number
-   * @default undefined
-   * @private
-   */
-  declare cacheHeight?: number;
-
-  /**
    * zoom level used on the cacheCanvas to draw the cache, X axe
    * since 1.7.0
    * @type number
@@ -442,7 +424,7 @@ export class FabricObject<
    * @return {Boolean} true if the canvas has been resized
    */
   _updateCacheCanvas() {
-    const canvas = this._cacheCanvas,
+    const canvas = this._cacheCanvas!,
       context = this._cacheContext,
       dims = this._limitCacheSize(this._getCacheCanvasDimensions()),
       minCacheSize = config.minCacheSideLimit,
@@ -450,8 +432,7 @@ export class FabricObject<
       height = dims.height,
       zoomX = dims.zoomX,
       zoomY = dims.zoomY,
-      dimensionsChanged =
-        width !== this.cacheWidth || height !== this.cacheHeight,
+      dimensionsChanged = width !== canvas.width || height !== canvas.height,
       zoomChanged = this.zoomX !== zoomX || this.zoomY !== zoomY;
 
     if (!canvas || !context) {
@@ -504,8 +485,6 @@ export class FabricObject<
         Math.round(canvas.width / 2 - drawingWidth) + drawingWidth;
       this.cacheTranslationY =
         Math.round(canvas.height / 2 - drawingHeight) + drawingHeight;
-      this.cacheWidth = width;
-      this.cacheHeight = height;
       context.translate(this.cacheTranslationX, this.cacheTranslationY);
       context.scale(zoomX, zoomY);
       this.zoomX = zoomX;
@@ -828,8 +807,6 @@ export class FabricObject<
   _removeCacheCanvas() {
     this._cacheCanvas = undefined;
     this._cacheContext = null;
-    this.cacheWidth = 0;
-    this.cacheHeight = 0;
   }
 
   /**
@@ -1007,20 +984,18 @@ export class FabricObject<
     if (this.isNotVisible()) {
       return false;
     }
-    if (
-      this._cacheCanvas &&
-      this._cacheContext &&
-      !skipCanvas &&
-      this._updateCacheCanvas()
-    ) {
+    const canvas = this._cacheCanvas;
+    const ctx = this._cacheContext;
+    if (canvas && ctx && !skipCanvas && this._updateCacheCanvas()) {
       // in this case the context is already cleared.
       return true;
     } else {
       if (this.dirty || (this.clipPath && this.clipPath.absolutePositioned)) {
-        if (this._cacheCanvas && this._cacheContext && !skipCanvas) {
-          const width = this.cacheWidth! / this.zoomX!;
-          const height = this.cacheHeight! / this.zoomY!;
-          this._cacheContext.clearRect(-width / 2, -height / 2, width, height);
+        if (canvas && ctx && !skipCanvas) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.restore();
         }
         return true;
       }
